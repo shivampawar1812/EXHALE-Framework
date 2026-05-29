@@ -468,3 +468,30 @@ print("\n===================================")
 print("MODEL TRAINING COMPLETE")
 print("===================================")
 
+# =========================================================
+# SAVE TUNED MODEL RESULTS
+# =========================================================
+
+tuned_results = pd.DataFrame([
+
+    {
+        "Model": "Tuned SVM",
+        "Accuracy": svm_accuracy,
+        "ROC AUC": svm_auc
+    },
+
+    {
+        "Model": "Tuned XGBoost",
+        "Accuracy": accuracy_score(y_test, y_pred_xgb),
+        "ROC AUC": roc_auc_score(y_test, y_prob_xgb)
+    }
+])
+
+tuned_results.to_csv(
+
+    "outputs/models/tuned_model_results.csv",
+
+    index=False
+)
+
+print("\nSaved: tuned_model_results.csv")
