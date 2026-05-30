@@ -2,6 +2,10 @@ import os
 import pandas as pd
 from dotenv import load_dotenv
 
+from mistralai import Mistral
+
+
+
 # =========================================================
 # LOAD ENV
 # =========================================================
@@ -104,6 +108,51 @@ try:
 except Exception as e:
 
     print(f"Llama Error: {e}")
+
+
+# =========================================================
+# MISTRAL LARGE
+# =========================================================
+
+try:
+
+    from mistralai import Mistral
+
+    api_key = os.getenv("MISTRAL_API_KEY")
+
+    client = Mistral(
+        api_key=api_key
+    )
+
+    response = client.chat.complete(
+
+        model="mistral-large-latest",
+
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    )
+
+    mistral_output = response.choices[0].message.content
+
+    with open(
+        "outputs/llm_outputs/mistral_output.txt",
+        "w",
+        encoding="utf-8"
+    ) as f:
+
+        f.write(mistral_output)
+
+    print("Mistral Output Saved")
+
+except Exception as e:
+
+    print(f"Mistral Error: {e}")
+
+
 
 # =========================================================
 # SAVE PROMPT
