@@ -1,0 +1,2 @@
+Model,Average_Semantic_Fidelity,Average_BERTScore_Similarity,Semantic_Entropy
+llama,0.83,0.605,0.365

@@ -58,7 +58,8 @@ outputs/feem_results/mistral_feem_results.csv
 # SFEEM RESULTS
 # =========================================================
 
-outputs/sfeem_results/
+outputs/sfeem_results/llama_sfeem.csv
+outputs/sfeem_results/mistral_sfeem.csv
 
 # =========================================================
 # API KEYS / ENV FILES
