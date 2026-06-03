@@ -230,9 +230,12 @@ FEEM serves as the baseline explainability evaluation framework and provides the
 
 S-FEEM (Semantic Fidelity Entropy Evaluation Metric) is the proposed evaluation framework developed in this research.
 
-S-FEEM was developed to quantitatively assess the quality of LLM-generated explanations. The metric combines four complementary dimensions: semantic similarity (S), feature fidelity (F), consistency (C), and hallucination robustness (H). The overall score is computed as:
+S-FEEM was developed to quantitatively assess the quality of LLM-generated explanations. The metric combines four complementary dimensions: semantic similarity (S), feature fidelity (F), consistency (C), and hallucination robustness (H).
+
+The overall score is computed as:
 
 S-FEEM=αS+βF+γC+δH
+
 
 where α+β+γ+δ=1. Semantic similarity measures agreement between generated and reference explanations, fidelity evaluates alignment with SHAP-important features, consistency quantifies stability across repeated generations, and hallucination robustness penalizes unsupported claims. Higher S-FEEM scores indicate more reliable, faithful, and clinically trustworthy explanations.
 
@@ -306,7 +309,7 @@ The tuned XGBoost model achieved the highest ROC-AUC score and was selected as t
 ## S-FEEM Results (Semantic Fidelity)
 
 | Model    | Semantic Fidelity | Mean Similarity | Semantic Entropy |
-|----------|----------------==-|-----------------|------------------|
+|----------|-------------------|-----------------|------------------|
 | Llama    | 0.860             | 0.600           | 0.717            |
 | Mistral  | 0.980             | 0.658           | 0.516            |
 
