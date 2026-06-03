@@ -190,8 +190,6 @@ The framework integrates multiple Large Language Models to transform SHAP output
 
 Integrated LLMs:
 
-* OpenAI GPT
-* Google Gemini
 * Mistral
 * Llama
 
@@ -225,6 +223,77 @@ Evaluation Components:
 * Cross-LLM explanation comparison
 
 This component represents the core research novelty of the framework.
+
+---
+
+# Outputs
+
+Generated outputs include:
+
+## Models
+
+* Baseline ML models
+* Tuned SVM
+* Tuned XGBoost
+
+## Explainability
+
+* SHAP plots
+* Feature importance CSVs
+
+## LLM Outputs
+
+* Multi-LLM explanations
+* Clinical reasoning summaries
+
+## Evaluation
+
+* S-FEEM scores
+* Semantic similarity reports
+* Fidelity comparison tables
+  
+---
+
+# Experimental Results
+
+## Model Performance
+
+| Model               | Accuracy | ROC-AUC |
+| ------------------- | -------- | ------- |
+| Logistic Regression | 0.873    | 0.768   |
+| SVM                 | 0.874    | 0.764   |
+| Random Forest       | 0.871    | 0.779   |
+| Tuned SVM           | 0.849    | 0.771   |
+| Tuned XGBoost       | 0.827    | 0.790   |
+
+The tuned XGBoost model achieved the highest ROC-AUC score and was selected as the primary prediction model for explainability and LLM-based reasoning generation.
+
+---
+
+## FEEM Results (Lexical Fidelity)
+
+| Model         | Fidelity | Weighted Fidelity | Entropy |
+| ------------- | -------- | ----------------- | ------- |
+| Llama 3.3 70B | 0.750    | 0.792             | 0.510   |
+| Mistral Large | 0.840    | 0.804             | 0.268   |
+
+---
+
+## S-FEEM Results (Semantic Fidelity)
+
+| Model         | Semantic Fidelity | Mean Similarity | Semantic Entropy |
+| ------------- | ----------------- | --------------- | ---------------- |
+| Llama 3.3 70B | 0.830             | 0.605           | 0.365            |
+| Mistral Large | 0.990             | 0.642           | 0.490            |
+
+---
+
+## Key Findings
+
+* S-FEEM consistently produced higher fidelity scores than keyword-based FEEM, demonstrating the importance of semantic evaluation for LLM-generated clinical explanations.
+* Mistral generated highly aligned semantic explanations, while Llama produced more lexically diverse reasoning patterns.
+* Entropy analysis revealed measurable differences in explanation consistency across LLM architectures.
+* The proposed S-FEEM framework effectively captures semantically equivalent medical reasoning missed by traditional lexical overlap metrics.
 
 ---
 
@@ -302,34 +371,6 @@ python src/llm_integration.py
 ```bash
 python src/sfeem.py
 ```
-
----
-
-# Outputs
-
-Generated outputs include:
-
-## Models
-
-* Baseline ML models
-* Tuned SVM
-* Tuned XGBoost
-
-## Explainability
-
-* SHAP plots
-* Feature importance CSVs
-
-## LLM Outputs
-
-* Multi-LLM explanations
-* Clinical reasoning summaries
-
-## Evaluation
-
-* S-FEEM scores
-* Semantic similarity reports
-* Fidelity comparison tables
 
 ---
 
