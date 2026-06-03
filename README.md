@@ -207,6 +207,25 @@ and generates:
 
 ---
 
+# FEEM Framework
+
+FEEM (Fidelity Entropy Evaluation Metric) is the lexical evaluation framework implemented in CLEAR-AI for assessing the reliability and consistency of LLM-generated clinical explanations.
+
+Purpose:
+Evaluate whether LLM explanations explicitly preserve SHAP-derived feature importance through keyword-level fidelity analysis.
+
+Evaluation Components:
+
+Exact feature fidelity
+Weighted fidelity scoring
+Entropy-based consistency analysis
+Exact match accuracy
+Cross-LLM lexical comparison
+
+FEEM serves as the baseline explainability evaluation framework and provides the foundation for the proposed semantic extension, S-FEEM.
+
+---
+
 # S-FEEM Framework
 
 S-FEEM (Semantic Fidelity Entropy Evaluation Metric) is the proposed evaluation framework developed in this research.
@@ -248,6 +267,7 @@ Generated outputs include:
 
 ## Evaluation
 
+* FEEM scores
 * S-FEEM scores
 * Semantic similarity reports
 * Fidelity comparison tables
@@ -263,6 +283,7 @@ Generated outputs include:
 | Logistic Regression | 0.873    | 0.768   |
 | SVM                 | 0.874    | 0.764   |
 | Random Forest       | 0.871    | 0.779   |
+| XGBoost             | 0.867    | 0.756   |
 | Tuned SVM           | 0.849    | 0.771   |
 | Tuned XGBoost       | 0.827    | 0.790   |
 
@@ -302,7 +323,7 @@ The tuned XGBoost model achieved the highest ROC-AUC score and was selected as t
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/CLEAR-AI-Framework.git
+git clone https://github.com/shivampawar1812/CLEAR-AI-Framework.git
 cd CLEAR-AI-Framework
 ```
 
