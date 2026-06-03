@@ -50,7 +50,8 @@ outputs/llm_outputs/
 # FEEM RESULTS
 # =========================================================
 
-outputs/feem_results/
+outputs/feem_results/llama_feem_results.csv
+outputs/feem_results/mistral_feem_results.csv
 
 
 # =========================================================
