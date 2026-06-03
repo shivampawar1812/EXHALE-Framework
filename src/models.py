@@ -24,474 +24,594 @@ from xgboost import XGBClassifier
 # CREATE OUTPUT DIRECTORY
 # =========================================================
 
-os.makedirs("outputs/models", exist_ok=True)
+os.makedirs(
+    "outputs/models",
+    exist_ok=True
+)
 
 # =========================================================
 # LOAD DATA
 # =========================================================
 
-train_df = pd.read_csv(
-    "data/processed/train.csv"
-)
+def load_data():
 
-test_df = pd.read_csv(
-    "data/processed/test.csv"
-)
+    train_df = pd.read_csv(
+        "data/processed/train.csv"
+    )
 
-X_train = train_df.drop(
-    columns=["target"]
-)
+    test_df = pd.read_csv(
+        "data/processed/test.csv"
+    )
 
-y_train = train_df["target"]
+    X_train = train_df.drop(
+        columns=["target"]
+    )
 
-X_test = test_df.drop(
-    columns=["target"]
-)
+    y_train = train_df["target"]
 
-y_test = test_df["target"]
+    X_test = test_df.drop(
+        columns=["target"]
+    )
 
-print("Data Loaded")
-print("Train Shape:", X_train.shape)
-print("Test Shape :", X_test.shape)
+    y_test = test_df["target"]
+
+    print("Data Loaded")
+
+    print(
+        "Train Shape:",
+        X_train.shape
+    )
+
+    print(
+        "Test Shape :",
+        X_test.shape
+    )
+
+    return (
+        X_train,
+        X_test,
+        y_train,
+        y_test
+    )
 
 # =========================================================
 # BASELINE MODELS
 # =========================================================
 
-models = {
+def get_models():
 
-    "Logistic Regression": LogisticRegression(
-        max_iter=500
-    ),
+    models = {
 
-    "Decision Tree": DecisionTreeClassifier(
-        random_state=42
-    ),
+        "Logistic Regression":
+        LogisticRegression(
+            max_iter=500
+        ),
 
-    "Random Forest": RandomForestClassifier(
-        n_estimators=200,
-        random_state=42
-    ),
+        "Decision Tree":
+        DecisionTreeClassifier(
+            random_state=42
+        ),
 
-    "Naive Bayes": GaussianNB(),
+        "Random Forest":
+        RandomForestClassifier(
+            n_estimators=200,
+            random_state=42
+        ),
 
-    "SVM": SVC(
-        probability=True,
-        kernel="rbf",
-        random_state=42
-    ),
+        "Naive Bayes":
+        GaussianNB(),
 
-    "XGBoost": XGBClassifier(
-        eval_metric="logloss",
-        random_state=42
+        "SVM":
+        SVC(
+            probability=True,
+            kernel="rbf",
+            random_state=42
+        ),
+
+        "XGBoost":
+        XGBClassifier(
+            eval_metric="logloss",
+            random_state=42
+        )
+    }
+
+    return models
+
+# =========================================================
+# TRAIN BASELINE MODELS
+# =========================================================
+
+def train_baseline_models(
+
+    X_train,
+    X_test,
+    y_train,
+    y_test
+):
+
+    models = get_models()
+
+    results = []
+
+    best_model = None
+    best_auc = 0
+
+    # -----------------------------------------------------
+
+    for model_name, model in models.items():
+
+        print("\n===================================")
+
+        print(f"Training: {model_name}")
+
+        # Train
+        model.fit(
+            X_train,
+            y_train
+        )
+
+        # Predictions
+        y_pred = model.predict(
+            X_test
+        )
+
+        y_prob = model.predict_proba(
+            X_test
+        )[:, 1]
+
+        # Metrics
+        accuracy = accuracy_score(
+            y_test,
+            y_pred
+        )
+
+        precision = precision_score(
+            y_test,
+            y_pred
+        )
+
+        recall = recall_score(
+            y_test,
+            y_pred
+        )
+
+        f1 = f1_score(
+            y_test,
+            y_pred
+        )
+
+        auc = roc_auc_score(
+            y_test,
+            y_prob
+        )
+
+        print(f"Accuracy : {accuracy:.4f}")
+        print(f"Precision: {precision:.4f}")
+        print(f"Recall   : {recall:.4f}")
+        print(f"F1 Score : {f1:.4f}")
+        print(f"ROC-AUC  : {auc:.4f}")
+
+        # Save results
+        results.append({
+
+            "Model": model_name,
+
+            "Accuracy": accuracy,
+
+            "Precision": precision,
+
+            "Recall": recall,
+
+            "F1 Score": f1,
+
+            "ROC AUC": auc
+        })
+
+        # Save model
+        model_path = (
+            f"outputs/models/"
+            f"{model_name}.pkl"
+        )
+
+        joblib.dump(
+            model,
+            model_path
+        )
+
+        print(f"Saved: {model_path}")
+
+        # Track best model
+        if auc > best_auc:
+
+            best_auc = auc
+
+            best_model = model_name
+
+    # -----------------------------------------------------
+
+    results_df = pd.DataFrame(
+        results
     )
-}
 
-# =========================================================
-# TRAIN + EVALUATE BASELINE MODELS
-# =========================================================
+    results_df = results_df.sort_values(
+        by="ROC AUC",
+        ascending=False
+    )
 
-results = []
+    results_df.to_csv(
 
-best_model = None
-best_auc = 0
+        "outputs/models/"
+        "baseline_model_results.csv",
 
-for model_name, model in models.items():
+        index=False
+    )
 
     print("\n===================================")
-    print(f"Training: {model_name}")
 
-    # Train model
-    model.fit(X_train, y_train)
+    print("BASELINE MODEL RESULTS")
 
-    # Predictions
-    y_pred = model.predict(X_test)
+    print(results_df)
 
-    # Probabilities
-    y_prob = model.predict_proba(X_test)[:, 1]
+    print("===================================")
 
-    # Metrics
-    accuracy = accuracy_score(y_test, y_pred)
-
-    precision = precision_score(y_test, y_pred)
-
-    recall = recall_score(y_test, y_pred)
-
-    f1 = f1_score(y_test, y_pred)
-
-    auc = roc_auc_score(y_test, y_prob)
-
-    print(f"Accuracy : {accuracy:.4f}")
-    print(f"Precision: {precision:.4f}")
-    print(f"Recall   : {recall:.4f}")
-    print(f"F1 Score : {f1:.4f}")
-    print(f"ROC-AUC  : {auc:.4f}")
-
-    # Save results
-    results.append({
-
-        "Model": model_name,
-        "Accuracy": accuracy,
-        "Precision": precision,
-        "Recall": recall,
-        "F1 Score": f1,
-        "ROC AUC": auc
-    })
-
-    # Save model
-    model_path = f"outputs/models/{model_name}.pkl"
-
-    joblib.dump(
-        model,
-        model_path
+    print(
+        f"\nBest Baseline Model:"
+        f" {best_model}"
     )
 
-    print(f"Saved: {model_path}")
+    print(
+        f"Best ROC-AUC:"
+        f" {best_auc:.4f}"
+    )
 
-    # Track best baseline model
-    if auc > best_auc:
-
-        best_auc = auc
-        best_model = model_name
-
-# =========================================================
-# SAVE BASELINE RESULTS
-# =========================================================
-
-results_df = pd.DataFrame(results)
-
-results_df = results_df.sort_values(
-    by="ROC AUC",
-    ascending=False
-)
-
-results_df.to_csv(
-    "outputs/models/baseline_model_results.csv",
-    index=False
-)
-
-print("\n===================================")
-print("BASELINE MODEL RESULTS")
-print(results_df)
-print("===================================")
-
-print(f"\nBest Baseline Model: {best_model}")
-print(f"Best ROC-AUC: {best_auc:.4f}")
+    return results_df
 
 # =========================================================
-# HYPERPARAMETER TUNING - SVM
+# HYPERPARAMETER TUNING OF SVM
 # =========================================================
+def tune_svm(
 
-print("\n===================================")
-print("SVM HYPERPARAMETER TUNING")
-print("===================================")
+    X_train,
+    X_test,
+    y_train,
+    y_test
+):
 
-param_grid_svm = {
+    print("\n===================================")
 
-    'C': [0.1, 10],
+    print("SVM HYPERPARAMETER TUNING")
 
-    'gamma': [0.01, 0.001],
+    print("===================================")
 
-    'kernel': ['rbf']
-}
+    # -----------------------------------------------------
 
-svm = SVC(
+    param_grid_svm = {
 
-    probability=True,
+        'C': [0.1, 10],
 
-    class_weight='balanced',
+        'gamma': [0.01, 0.001],
 
-    random_state=42
-)
+        'kernel': ['rbf']
+    }
 
-grid_svm = GridSearchCV(
+    svm = SVC(
 
-    svm,
+        probability=True,
 
-    param_grid_svm,
+        class_weight='balanced',
 
-    cv=3,
+        random_state=42
+    )
 
-    scoring='roc_auc',
+    grid_svm = GridSearchCV(
 
-    verbose=2,
+        svm,
 
-    n_jobs=-1
-)
+        param_grid_svm,
 
-grid_svm.fit(X_train, y_train)
+        cv=3,
 
-print("\nBest Parameters:")
-print(grid_svm.best_params_)
+        scoring='roc_auc',
 
-best_svm = SVC(
+        verbose=2,
 
-    C=grid_svm.best_params_['C'],
+        n_jobs=-1
+    )
 
-    gamma=grid_svm.best_params_['gamma'],
+    grid_svm.fit(
 
-    kernel='rbf',
+        X_train,
+        y_train
+    )
 
-    probability=True,
+    print("\nBest Parameters:")
 
-    class_weight='balanced',
+    print(
+        grid_svm.best_params_
+    )
 
-    random_state=42
-)
+    # -----------------------------------------------------
 
-best_svm.fit(X_train, y_train)
+    best_svm = SVC(
 
-# Predictions
-y_prob_svm = best_svm.predict_proba(X_test)[:, 1]
+        C=grid_svm.best_params_['C'],
 
-y_pred_svm = (y_prob_svm > 0.30).astype(int)
+        gamma=
+        grid_svm.best_params_['gamma'],
 
-# Metrics
-svm_accuracy = accuracy_score(
-    y_test,
-    y_pred_svm
-)
+        kernel='rbf',
 
-svm_auc = roc_auc_score(
-    y_test,
-    y_prob_svm
-)
+        probability=True,
 
-print("\nTUNED SVM RESULTS")
-print(f"Accuracy : {svm_accuracy:.4f}")
-print(f"ROC-AUC  : {svm_auc:.4f}")
+        class_weight='balanced',
 
-# Save tuned SVM
-joblib.dump(
-    best_svm,
-    "outputs/models/tuned_svm.pkl"
-)
+        random_state=42
+    )
 
-print("Saved: outputs/models/tuned_svm.pkl")
+    best_svm.fit(
 
-# =========================================================
-# HYPERPARAMETER TUNING - XGBOOST
-# =========================================================
+        X_train,
+        y_train
+    )
 
-print("\n===================================")
-print("XGBOOST HYPERPARAMETER TUNING")
-print("===================================")
+    # -----------------------------------------------------
 
-param_grid_xgb = {
+    y_prob_svm = (
 
-    'n_estimators': [200, 300],
+        best_svm
+        .predict_proba(X_test)[:, 1]
+    )
 
-    'max_depth': [4, 5, 6],
+    y_pred_svm = (
 
-    'learning_rate': [0.03, 0.05],
+        y_prob_svm > 0.30
+    ).astype(int)
 
-    'subsample': [0.8],
+    # -----------------------------------------------------
 
-    'colsample_bytree': [0.8]
-}
+    svm_accuracy = accuracy_score(
 
-xgb = XGBClassifier(
+        y_test,
 
-    scale_pos_weight=5,
+        y_pred_svm
+    )
 
-    eval_metric='logloss',
+    svm_auc = roc_auc_score(
 
-    random_state=42
-)
+        y_test,
 
-grid_xgb = GridSearchCV(
+        y_prob_svm
+    )
 
-    xgb,
+    print("\nTUNED SVM RESULTS")
 
-    param_grid_xgb,
+    print(
+        f"Accuracy : "
+        f"{svm_accuracy:.4f}"
+    )
 
-    cv=3,
+    print(
+        f"ROC-AUC  : "
+        f"{svm_auc:.4f}"
+    )
 
-    scoring='roc_auc',
+    # -----------------------------------------------------
 
-    verbose=2,
+    joblib.dump(
 
-    n_jobs=-1
-)
+        best_svm,
 
-grid_xgb.fit(X_train, y_train)
+        "outputs/models/tuned_svm.pkl"
+    )
 
-print("\nBest Parameters:")
-print(grid_xgb.best_params_)
+    print(
+        "Saved: "
+        "outputs/models/tuned_svm.pkl"
+    )
 
-best_xgb = XGBClassifier(
-
-    n_estimators=grid_xgb.best_params_['n_estimators'],
-
-    max_depth=grid_xgb.best_params_['max_depth'],
-
-    learning_rate=grid_xgb.best_params_['learning_rate'],
-
-    subsample=grid_xgb.best_params_['subsample'],
-
-    colsample_bytree=grid_xgb.best_params_['colsample_bytree'],
-
-    scale_pos_weight=5,
-
-    eval_metric='logloss',
-
-    random_state=42
-)
-
-best_xgb.fit(X_train, y_train)
-
-# Predictions
-y_prob_xgb = best_xgb.predict_proba(X_test)[:, 1]
+    return best_svm
 
 # =========================================================
-# THRESHOLD ANALYSIS
+# HYPERPARAMETER TUNING OF XGB
 # =========================================================
+def tune_xgboost(
 
-thresholds = [
+    X_train,
+    X_test,
+    y_train,
+    y_test
+):
 
-    0.1,
-    0.2,
-    0.3,
-    0.4,
-    0.5,
-    0.6,
-    0.7
-]
+    print("\n===================================")
 
-print("\n===================================")
-print("XGBOOST THRESHOLD ANALYSIS")
-print("===================================")
+    print("XGBOOST HYPERPARAMETER TUNING")
 
-for t in thresholds:
+    print("===================================")
+
+    # -----------------------------------------------------
+
+    param_grid_xgb = {
+
+        'n_estimators': [200, 300],
+
+        'max_depth': [4, 5, 6],
+
+        'learning_rate': [0.03, 0.05],
+
+        'subsample': [0.8],
+
+        'colsample_bytree': [0.8]
+    }
+
+    xgb = XGBClassifier(
+
+        scale_pos_weight=5,
+
+        eval_metric='logloss',
+
+        random_state=42
+    )
+
+    grid_xgb = GridSearchCV(
+
+        xgb,
+
+        param_grid_xgb,
+
+        cv=3,
+
+        scoring='roc_auc',
+
+        verbose=2,
+
+        n_jobs=-1
+    )
+
+    grid_xgb.fit(
+
+        X_train,
+        y_train
+    )
+
+    print("\nBest Parameters:")
+
+    print(
+        grid_xgb.best_params_
+    )
+
+    # -----------------------------------------------------
+
+    best_xgb = XGBClassifier(
+
+        n_estimators=
+        grid_xgb.best_params_[
+            'n_estimators'
+        ],
+
+        max_depth=
+        grid_xgb.best_params_[
+            'max_depth'
+        ],
+
+        learning_rate=
+        grid_xgb.best_params_[
+            'learning_rate'
+        ],
+
+        subsample=
+        grid_xgb.best_params_[
+            'subsample'
+        ],
+
+        colsample_bytree=
+        grid_xgb.best_params_[
+            'colsample_bytree'
+        ],
+
+        scale_pos_weight=5,
+
+        eval_metric='logloss',
+
+        random_state=42
+    )
+
+    best_xgb.fit(
+
+        X_train,
+        y_train
+    )
+
+    # -----------------------------------------------------
+
+    y_prob_xgb = (
+
+        best_xgb
+        .predict_proba(X_test)[:, 1]
+    )
 
     y_pred_xgb = (
 
-        y_prob_xgb >= t
-
+        y_prob_xgb >= 0.5
     ).astype(int)
 
-    print(f"\nThreshold: {t}")
+    # -----------------------------------------------------
 
-    print(
+    xgb_accuracy = accuracy_score(
 
-        "Accuracy:",
-
-        accuracy_score(
-            y_test,
-            y_pred_xgb
-        )
-    )
-
-    print(
-
-        "Precision:",
-
-        precision_score(
-            y_test,
-            y_pred_xgb
-        )
-    )
-
-    print(
-
-        "Recall:",
-
-        recall_score(
-            y_test,
-            y_pred_xgb
-        )
-    )
-
-    print(
-
-        "F1 Score:",
-
-        f1_score(
-            y_test,
-            y_pred_xgb
-        )
-    )
-
-    print(
-
-        "ROC AUC:",
-
-        roc_auc_score(
-            y_test,
-            y_prob_xgb
-        )
-    )
-
-    print("---------------------------")
-
-# =========================================================
-# FINAL XGBOOST EVALUATION
-# =========================================================
-
-y_pred_xgb = (
-
-    y_prob_xgb >= 0.5
-
-).astype(int)
-
-print("\n===================================")
-print("FINAL XGBOOST RESULTS")
-print("===================================")
-
-print("Accuracy Score")
-
-print(
-    accuracy_score(
         y_test,
+
         y_pred_xgb
     )
-)
 
-print("\nROC AUC Score")
+    xgb_auc = roc_auc_score(
 
-print(
-    roc_auc_score(
         y_test,
+
         y_prob_xgb
     )
-)
 
-# Save tuned XGBoost
-joblib.dump(
-    best_xgb,
-    "outputs/models/tuned_xgboost.pkl"
-)
+    print("\nFINAL XGBOOST RESULTS")
 
-print("\nSaved: outputs/models/tuned_xgboost.pkl")
+    print(
+        f"Accuracy : "
+        f"{xgb_accuracy:.4f}"
+    )
 
-print("\n===================================")
-print("MODEL TRAINING COMPLETE")
-print("===================================")
+    print(
+        f"ROC-AUC  : "
+        f"{xgb_auc:.4f}"
+    )
+
+    # -----------------------------------------------------
+
+    joblib.dump(
+
+        best_xgb,
+
+        "outputs/models/tuned_xgboost.pkl"
+    )
+
+    print(
+        "Saved: "
+        "outputs/models/tuned_xgboost.pkl"
+    )
+
+    return best_xgb
+
 
 # =========================================================
-# SAVE TUNED MODEL RESULTS
+# MAIN
 # =========================================================
 
-tuned_results = pd.DataFrame([
+if __name__ == "__main__":
 
-    {
-        "Model": "Tuned SVM",
-        "Accuracy": svm_accuracy,
-        "ROC AUC": svm_auc
-    },
+    (
+        X_train,
+        X_test,
+        y_train,
+        y_test
+    ) = load_data()
 
-    {
-        "Model": "Tuned XGBoost",
-        "Accuracy": accuracy_score(y_test, y_pred_xgb),
-        "ROC AUC": roc_auc_score(y_test, y_prob_xgb)
-    }
-])
+    train_baseline_models(
 
-tuned_results.to_csv(
+        X_train,
+        X_test,
+        y_train,
+        y_test
+    )
 
-    "outputs/models/tuned_model_results.csv",
+    tune_svm(
 
-    index=False
-)
+        X_train,
+        X_test,
+        y_train,
+        y_test
+    )
 
-print("\nSaved: tuned_model_results.csv")
+    tune_xgboost(
+
+        X_train,
+        X_test,
+        y_train,
+        y_test
+    )

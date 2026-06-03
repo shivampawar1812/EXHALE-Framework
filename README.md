@@ -295,8 +295,8 @@ The tuned XGBoost model achieved the highest ROC-AUC score and was selected as t
 
 | Model         | Fidelity | Weighted Fidelity | Entropy |
 | ------------- | -------- | ----------------- | ------- |
-| Llama 3.3 70B | 0.750    | 0.792             | 0.510   |
-| Mistral Large | 0.840    | 0.804             | 0.268   |
+| Llama 3.3 70B | 0.780    | 0.722             | 0.450   |
+| Mistral Large | 0.860    | 0.767             | 0.290   |
 
 ---
 

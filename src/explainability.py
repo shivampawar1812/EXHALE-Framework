@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # =========================================================
-# CREATE OUTPUT DIRECTORIES
+# CREATE OUTPUT DIRECTORY
 # =========================================================
 
 os.makedirs(
@@ -17,198 +17,292 @@ os.makedirs(
 # LOAD DATA
 # =========================================================
 
-train_df = pd.read_csv(
-    "data/processed/train.csv"
-)
+def load_data():
 
-test_df = pd.read_csv(
-    "data/processed/test.csv"
-)
+    train_df = pd.read_csv(
+        "data/processed/train.csv"
+    )
 
-X_train = train_df.drop(
-    columns=["target"]
-)
+    test_df = pd.read_csv(
+        "data/processed/test.csv"
+    )
 
-y_train = train_df["target"]
+    X_train = train_df.drop(
+        columns=["target"]
+    )
 
-X_test = test_df.drop(
-    columns=["target"]
-)
+    y_train = train_df["target"]
 
-y_test = test_df["target"]
+    X_test = test_df.drop(
+        columns=["target"]
+    )
 
-print("Data Loaded")
-print("Train Shape:", X_train.shape)
-print("Test Shape :", X_test.shape)
+    y_test = test_df["target"]
 
-# =========================================================
-# LOAD TUNED XGBOOST MODEL
-# =========================================================
+    print("Data Loaded")
 
-model = joblib.load(
-    "outputs/models/tuned_xgboost.pkl"
-)
+    print(
+        "Train Shape:",
+        X_train.shape
+    )
 
-print("\nTuned XGBoost Loaded")
+    print(
+        "Test Shape :",
+        X_test.shape
+    )
 
-# =========================================================
-# CREATE SHAP EXPLAINER
-# =========================================================
-
-explainer = shap.TreeExplainer(model)
-
-print("SHAP Explainer Created")
-
-# =========================================================
-# COMPUTE SHAP VALUES
-# =========================================================
-
-shap_values = explainer.shap_values(X_test)
-
-print("SHAP Values Computed")
+    return (
+        X_train,
+        X_test,
+        y_train,
+        y_test
+    )
 
 # =========================================================
-# SHAP SUMMARY PLOT
+# LOAD MODEL
 # =========================================================
 
-plt.figure()
+def load_model():
 
-shap.summary_plot(
-    shap_values,
-    X_test,
-    show=False
-)
+    model = joblib.load(
+        "outputs/models/tuned_xgboost.pkl"
+    )
 
-plt.savefig(
-    "outputs/shap/shap_summary_plot.png",
-    bbox_inches="tight",
-    dpi=300
-)
+    print("\nTuned XGBoost Loaded")
 
-plt.close()
-
-print("Saved: shap_summary_plot.png")
+    return model
 
 # =========================================================
-# SHAP BAR PLOT
+# GENERATE SHAP ANALYSIS
 # =========================================================
 
-plt.figure()
+def generate_shap_explanations(
 
-shap.summary_plot(
-    shap_values,
-    X_test,
-    plot_type="bar",
-    show=False
-)
+    model,
+    X_train,
+    X_test
+):
 
-plt.savefig(
-    "outputs/shap/shap_bar_plot.png",
-    bbox_inches="tight",
-    dpi=300
-)
+    # -----------------------------------------------------
 
-plt.close()
+    explainer = shap.TreeExplainer(
+        model
+    )
 
-print("Saved: shap_bar_plot.png")
+    print("SHAP Explainer Created")
+
+    # -----------------------------------------------------
+
+    shap_values = explainer.shap_values(
+        X_test
+    )
+
+    print("SHAP Values Computed")
+
+    # =====================================================
+    # SUMMARY PLOT
+    # =====================================================
+
+    plt.figure()
+
+    shap.summary_plot(
+
+        shap_values,
+
+        X_test,
+
+        show=False
+    )
+
+    plt.savefig(
+
+        "outputs/shap/"
+        "shap_summary_plot.png",
+
+        bbox_inches="tight",
+
+        dpi=300
+    )
+
+    plt.close()
+
+    print(
+        "Saved: shap_summary_plot.png"
+    )
+
+    # =====================================================
+    # BAR PLOT
+    # =====================================================
+
+    plt.figure()
+
+    shap.summary_plot(
+
+        shap_values,
+
+        X_test,
+
+        plot_type="bar",
+
+        show=False
+    )
+
+    plt.savefig(
+
+        "outputs/shap/"
+        "shap_bar_plot.png",
+
+        bbox_inches="tight",
+
+        dpi=300
+    )
+
+    plt.close()
+
+    print(
+        "Saved: shap_bar_plot.png"
+    )
+
+    # =====================================================
+    # FORCE PLOT
+    # =====================================================
+
+    force_plot = shap.force_plot(
+
+        explainer.expected_value,
+
+        shap_values[0],
+
+        X_test.iloc[0],
+
+        matplotlib=False
+    )
+
+    shap.save_html(
+
+        "outputs/shap/"
+        "shap_force_plot.html",
+
+        force_plot
+    )
+
+    print(
+        "Saved: shap_force_plot.html"
+    )
+
+    # =====================================================
+    # DEPENDENCE PLOT
+    # =====================================================
+
+    top_feature = X_test.columns[
+
+        abs(shap_values).mean(0).argmax()
+    ]
+
+    plt.figure()
+
+    shap.dependence_plot(
+
+        top_feature,
+
+        shap_values,
+
+        X_test,
+
+        show=False
+    )
+
+    plt.savefig(
+
+        "outputs/shap/"
+        "shap_dependence_plot.png",
+
+        bbox_inches="tight",
+
+        dpi=300
+    )
+
+    plt.close()
+
+    print(
+        "Saved: shap_dependence_plot.png"
+    )
+
+    # =====================================================
+    # FEATURE IMPORTANCE CSV
+    # =====================================================
+
+    feature_importance = pd.DataFrame({
+
+        "Feature": X_test.columns,
+
+        "Mean_SHAP_Value":
+        abs(shap_values).mean(axis=0)
+    })
+
+    feature_importance = (
+        feature_importance.sort_values(
+
+            by="Mean_SHAP_Value",
+
+            ascending=False
+        )
+    )
+
+    feature_importance.to_csv(
+
+        "outputs/shap/"
+        "shap_feature_importance.csv",
+
+        index=False
+    )
+
+    print(
+        "Saved: shap_feature_importance.csv"
+    )
+
+    # =====================================================
+    # TOP FEATURES
+    # =====================================================
+
+    print("\n===================================")
+
+    print("TOP 20 IMPORTANT FEATURES")
+
+    print("===================================")
+
+    print(
+        feature_importance.head(20)
+    )
+
+    print("\n===================================")
+
+    print("SHAP ANALYSIS COMPLETE")
+
+    print("===================================")
+
+    return feature_importance
 
 # =========================================================
-# SHAP FORCE PLOT (FIRST SAMPLE)
+# MAIN
 # =========================================================
 
-force_plot = shap.force_plot(
+if __name__ == "__main__":
 
-    explainer.expected_value,
+    (
+        X_train,
+        X_test,
+        y_train,
+        y_test
+    ) = load_data()
 
-    shap_values[0],
+    model = load_model()
 
-    X_test.iloc[0],
+    generate_shap_explanations(
 
-    matplotlib=False
-)
+        model,
 
-shap.save_html(
+        X_train,
 
-    "outputs/shap/shap_force_plot.html",
-
-    force_plot
-)
-
-print("Saved: shap_force_plot.html")
-
-# =========================================================
-# SHAP DEPENDENCE PLOT
-# =========================================================
-
-top_feature = X_test.columns[
-    abs(shap_values).mean(0).argmax()
-]
-
-plt.figure()
-
-shap.dependence_plot(
-
-    top_feature,
-
-    shap_values,
-
-    X_test,
-
-    show=False
-)
-
-plt.savefig(
-
-    "outputs/shap/shap_dependence_plot.png",
-
-    bbox_inches="tight",
-
-    dpi=300
-)
-
-plt.close()
-
-print("Saved: shap_dependence_plot.png")
-
-# =========================================================
-# FEATURE IMPORTANCE CSV
-# =========================================================
-
-feature_importance = pd.DataFrame({
-
-    "Feature": X_test.columns,
-
-    "Mean_SHAP_Value": abs(shap_values).mean(axis=0)
-})
-
-feature_importance = feature_importance.sort_values(
-
-    by="Mean_SHAP_Value",
-
-    ascending=False
-)
-
-feature_importance.to_csv(
-
-    "outputs/shap/shap_feature_importance.csv",
-
-    index=False
-)
-
-print("Saved: shap_feature_importance.csv")
-
-# =========================================================
-# TOP 20 FEATURES
-# =========================================================
-
-print("\n===================================")
-print("TOP 20 IMPORTANT FEATURES")
-print("===================================")
-
-print(
-    feature_importance.head(20)
-)
-
-print("\n===================================")
-print("SHAP ANALYSIS COMPLETE")
-print("===================================")
+        X_test
+    )

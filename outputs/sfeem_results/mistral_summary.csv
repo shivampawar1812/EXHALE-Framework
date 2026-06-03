@@ -1,2 +1,2 @@
 Model,Average_Semantic_Fidelity,Average_BERTScore_Similarity,Semantic_Entropy
-mistral,0.99,0.642,0.49
+mistral,0.98,0.658,0.516
