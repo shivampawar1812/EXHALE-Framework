@@ -2,6 +2,7 @@ import os
 import re
 import math
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from collections import Counter
 
@@ -387,11 +388,6 @@ def run_feem_evaluation(
 
     entropy = compute_entropy(feature_sets)
 
-    exact_match = compute_exact_match_accuracy(
-        feature_sets,
-        top_features
-    )
-
     # -----------------------------------------------------
     # SAVE RESULTS
     # -----------------------------------------------------
@@ -432,7 +428,6 @@ def run_feem_evaluation(
 
         "Entropy": round(entropy, 3),
 
-        "Exact_Match_Accuracy": round(exact_match, 3)
     }
 
     summary_df = pd.DataFrame([summary])
@@ -459,9 +454,47 @@ def run_feem_evaluation(
 
     print(f"Entropy: {entropy:.3f}")
 
-    print(f"Exact Match Accuracy: {exact_match:.3f}")
-
     print("=================================\n")
+
+# ======================================================
+# FEEM COMPARISON GRAPH
+# ======================================================
+
+    metrics = [
+
+        avg_fidelity,
+
+        avg_weighted,
+
+        entropy,
+    ]
+
+    labels = [
+
+        "Fidelity",
+
+        "Weighted",
+
+        "Entropy",
+    ]
+
+    plt.bar(
+        labels,
+        metrics
+    )
+
+    plt.title(
+        f"{model_name.upper()} FEEM Results"
+    )
+
+    plt.ylim(0, 1)
+
+    plt.savefig(
+        f"outputs/feem_results/{model_name}_feem_graph.png",
+        dpi=300
+    )
+
+    plt.show()
 
 # =========================================================
 # MAIN

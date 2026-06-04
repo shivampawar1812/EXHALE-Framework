@@ -1,12 +1,15 @@
 import os
 import joblib
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
+
 
 from sklearn.model_selection import GridSearchCV
 
@@ -15,7 +18,9 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
     f1_score,
-    roc_auc_score
+    confusion_matrix,
+    roc_auc_score,
+    roc_curve
 )
 
 from xgboost import XGBClassifier
@@ -395,6 +400,29 @@ def tune_svm(
         f"{svm_auc:.4f}"
     )
 
+    cm = confusion_matrix(
+        y_test,
+        y_pred_svm
+    )
+
+    sns.heatmap(
+        cm,
+        annot=True,
+        fmt='d',
+        cmap='Blues'
+    )
+
+    plt.title("SVM Confusion Matrix")
+
+    plt.xlabel("Predicted")
+
+    plt.ylabel("Actual")
+
+    plt.savefig(
+        "outputs/plots/svm_confusion_matrix.png"
+    )
+
+    plt.show()
     # -----------------------------------------------------
 
     joblib.dump(
@@ -409,7 +437,7 @@ def tune_svm(
         "outputs/models/tuned_svm.pkl"
     )
 
-    return best_svm
+    return best_svm, y_prob_svm, svm_auc
 
 # =========================================================
 # HYPERPARAMETER TUNING OF XGB
@@ -562,6 +590,29 @@ def tune_xgboost(
         f"{xgb_auc:.4f}"
     )
 
+    cm = confusion_matrix(
+        y_test,
+        y_pred_xgb
+    )
+
+    sns.heatmap(
+        cm,
+        annot=True,
+        fmt='d',
+        cmap='Blues'
+    )
+
+    plt.title(" XGBoost Confusion Matrix")
+
+    plt.xlabel("Predicted")
+
+    plt.ylabel("Actual")
+
+    plt.savefig(
+        "outputs/plots/xgb_confusion_matrix.png"
+    )
+
+    plt.show()
     # -----------------------------------------------------
 
     joblib.dump(
@@ -576,8 +627,7 @@ def tune_xgboost(
         "outputs/models/tuned_xgboost.pkl"
     )
 
-    return best_xgb
-
+    return best_xgb, y_prob_xgb, xgb_auc
 
 # =========================================================
 # MAIN
@@ -600,7 +650,7 @@ if __name__ == "__main__":
         y_test
     )
 
-    tune_svm(
+    best_svm, y_prob_svm, svm_auc = tune_svm(
 
         X_train,
         X_test,
@@ -608,10 +658,30 @@ if __name__ == "__main__":
         y_test
     )
 
-    tune_xgboost(
+    best_xgb, y_prob_xgb, xgb_auc = tune_xgboost(
 
         X_train,
         X_test,
         y_train,
         y_test
     )
+
+    plt.plot(
+        *roc_curve(y_test, y_prob_svm)[:2],
+        label=f"SVM AUC={svm_auc:.3f}"
+    )
+
+    plt.plot(
+        *roc_curve(y_test, y_prob_xgb)[:2],
+        label=f"XGB AUC={xgb_auc:.3f}"
+    )
+
+    plt.plot([0,1],[0,1],'--')
+
+    plt.legend()
+
+    plt.savefig(
+        "outputs/plots/roc_auc.png"
+    )
+
+    plt.show()

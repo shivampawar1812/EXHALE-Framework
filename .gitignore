@@ -38,7 +38,8 @@ outputs/models/*.pkl
 # SHAP OUTPUTS
 # =========================================================
 
-outputs/shap/
+outputs/shap/shap_feature_importance.csv
+outputs/shap/shap_force_plot.html
 
 # =========================================================
 # LLM OUTPUTS

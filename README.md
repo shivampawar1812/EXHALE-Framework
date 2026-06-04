@@ -299,19 +299,18 @@ The tuned XGBoost model achieved the highest ROC-AUC score and was selected as t
 
 ## FEEM Results (Lexical Fidelity)
 
-| Model    | Fidelity  | Weighted Fidelity | Entropy  |
-|----------|-----------|-------------------|----------|
-| Llama    | 0.660     | 0.655             | 0.772    |
-| Mistral  | 0.720     | 0.712             | 0.278    |
+| Model         | Fidelity | Weighted Fidelity | Entropy |
+| ------------- | -------- | ----------------- | ------- |
+| Llama 3.3 70B | 0.610    | 0.586             | 0.752   |
+| Mistral Large | 0.720    | 0.605             | 0.167   |
 
----
 
 ## S-FEEM Results (Semantic Fidelity)
 
-| Model    | Semantic Fidelity | Mean Similarity | Semantic Entropy |
-|----------|-------------------|-----------------|------------------|
-| Llama    | 0.860             | 0.600           | 0.717            |
-| Mistral  | 0.980             | 0.658           | 0.516            |
+| Model         | Semantic Fidelity | Mean Similarity | Semantic Entropy |
+| ------------- | ----------------- | --------------- | ---------------- |
+| Llama 3.3 70B | 0.800             | 0.602           | 0.734            |
+| Mistral Large | 0.960             | 0.652           | 0.482            |
 
 ---
 

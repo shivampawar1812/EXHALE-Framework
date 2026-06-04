@@ -1,6 +1,8 @@
 import os
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from sklearn.model_selection import (
     train_test_split
@@ -40,6 +42,37 @@ def preprocess_data(
     print("Dataset Loaded")
 
     print(df.shape)
+
+    # =====================================================
+    # CORRELATION HEATMAP
+    # =====================================================
+
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+    plt.figure(figsize=(14, 10))
+
+    sns.heatmap(
+
+        df.corr(numeric_only=True),
+
+        cmap="coolwarm",
+
+        linewidths=0.3
+    )
+
+    plt.title(
+        "Feature Correlation Heatmap"
+    )
+
+    plt.tight_layout()
+
+    plt.savefig(
+        "outputs/plots/correlation_heatmap.png",
+        dpi=300
+    )
+
+    plt.show()
 
     # =====================================================
     # TARGET COLUMN

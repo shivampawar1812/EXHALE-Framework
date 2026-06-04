@@ -1,2 +1,2 @@
 Model,Average_Fidelity,Average_Weighted_Fidelity,Entropy,Exact_Match_Accuracy
-mistral,0.72,0.712,0.278,0.0
+mistral,0.72,0.605,0.167,0.0

@@ -3,6 +3,8 @@ import math
 import re
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from collections import Counter
 
@@ -434,6 +436,46 @@ def run_sfeem_evaluation(
     )
 
     print("=================================\n")
+
+# ======================================================
+# S-FEEM COMPARISON GRAPH
+# ======================================================
+
+    metrics = [
+
+        avg_semantic_fidelity,
+
+        avg_similarity,
+
+        semantic_entropy
+    ]
+
+    labels = [
+
+        "Semantic Fidelity",
+
+        "Average Similarity",
+
+        "Semantic Entropy"
+    ]
+
+    plt.bar(
+        labels,
+        metrics
+    )
+
+    plt.title(
+        f"{model_name.upper()} S-FEEM Results"
+    )
+
+    plt.ylim(0, 1)
+
+    plt.savefig(
+        f"outputs/sfeem_results/{model_name}_sfeem_graph.png",
+        dpi=300
+    )
+
+    plt.show()
 
 # =========================================================
 # MAIN
