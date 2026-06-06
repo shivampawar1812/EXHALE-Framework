@@ -36,11 +36,14 @@ Download the following files from the official CDC NHANES website:
 | Body Measures        | BMX_G.XPT    |
 | Smoking              | SMQ_G.XPT    |
 | Sleep Disorders      | SLQ_G.XPT    |
-| Blood Pressure       | BPX_G.XPT    |
+| Blood Pressure       | BPQ_G.XPT    |
 | Complete Blood Count | CBC_G.XPT    |
-| Diet Behavior        | DBQ_G.XPT    |
+| Dietary Interview    | DR1TOT.XPT   |
 | Physical Activity    | PAQ_G.XPT    |
 | Biochemistry Profile | BIOPRO_G.XPT |
+| Respiratory Health   | RDQ_G.XPT    |
+| Citinie Activity     | COTNAL_G.XPT |
+| Glycohemoglobin      | GHB.XPT      |
 
 ---
 
