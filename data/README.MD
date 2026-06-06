@@ -42,7 +42,7 @@ Download the following files from the official CDC NHANES website:
 | Physical Activity    | PAQ_G.XPT    |
 | Biochemistry Profile | BIOPRO_G.XPT |
 | Respiratory Health   | RDQ_G.XPT    |
-| Citinie Activity     | COTNAL_G.XPT |
+| Cotinie Activity     | COTNAL_G.XPT |
 | Glycohemoglobin      | GHB.XPT      |
 
 ---
