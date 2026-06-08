@@ -283,12 +283,12 @@ Generated outputs include:
 
 | Model               | Accuracy | ROC-AUC |
 | ------------------- | -------- | ------- |
-| Logistic Regression | 0.873    | 0.768   |
-| SVM                 | 0.874    | 0.764   |
+| Logistic Regression | 0.872    | 0.779   |
+| SVM                 | 0.874    | 0.763   |
 | Random Forest       | 0.871    | 0.779   |
-| XGBoost             | 0.867    | 0.756   |
-| Tuned SVM           | 0.849    | 0.771   |
-| Tuned XGBoost       | 0.827    | 0.790   |
+| XGBoost             | 0.864    | 0.754   |
+| Tuned SVM           | 0.849    | 0.772   |
+| Tuned XGBoost       | 0.820    | 0.787   |
 
 The tuned XGBoost model achieved the highest ROC-AUC score and was selected as the primary prediction model for explainability and LLM-based reasoning generation.
 
@@ -298,16 +298,16 @@ The tuned XGBoost model achieved the highest ROC-AUC score and was selected as t
 
 | Model         | Fidelity | Weighted Fidelity | Entropy |
 | ------------- | -------- | ----------------- | ------- |
-| Llama 3.3 70B | 0.610    | 0.586             | 0.752   |
-| Mistral Large | 0.720    | 0.605             | 0.167   |
+| Llama 3.3 70B | 0.790    | 0.803             | 0.517   |
+| Mistral Large | 0.750    | 0.692             | 0.228   |
 
 
 ## S-FEEM Results (Semantic Fidelity)
 
-| Model         | Semantic Fidelity | Mean Similarity | Semantic Entropy |
+| Model         | Semantic Fidelity | Mean BERTScore Similarity | Semantic Entropy |
 | ------------- | ----------------- | --------------- | ---------------- |
-| Llama 3.3 70B | 0.800             | 0.602           | 0.734            |
-| Mistral Large | 0.960             | 0.652           | 0.482            |
+| Llama 3.3 70B | 0.860             | 0.613           | 0.506            |
+| Mistral Large | 0.990             | 0.661           | 0.632            |
 
 ---
 
