@@ -1,37 +1,34 @@
-# CLEAR-AI: Clinical Language based Explainable Reasoning AI
+# EXHALE
 
-An Explainable and LLM-Augmented Machine Learning Framework for Asthma Prediction using NHANES 2011–2012 Data.
+## EXplainable Healthcare AI with Linguistic Evaluation
+
+An interpretable machine learning and large language model framework for asthma risk prediction, clinical reasoning generation, and explanation fidelity evaluation using NHANES 2011–2012 data.
 
 ---
 
 # Overview
 
-CLEAR-AI-Framework is a healthcare-focused Explainable AI (XAI) research pipeline developed for asthma prediction using the NHANES 2011–2012 dataset.
+EXHALE (EXplainable Healthcare AI with Linguistic Evaluation) is a healthcare-focused explainable AI framework designed to bridge the gap between machine learning predictions and clinically meaningful reasoning.
 
-The framework combines:
+The framework combines predictive modeling, SHAP-based explainability, large language models (LLMs), and a novel semantic evaluation framework (S-FEEM) to generate, analyze, and validate clinical explanations for asthma risk prediction.
 
-* Classical Machine Learning
-* Hyperparameter-Tuned Models
-* Explainable AI (SHAP)
-* Multiple Large Language Models (LLMs)
-* Semantic Fidelity and Entropy Evaluation Metircs (S-FEEM)
-
-to create clinically interpretable and trustworthy AI predictions.
-
-The project focuses not only on predictive performance but also on explanation quality, interpretability, and semantic consistency across multiple LLMs.
+Unlike traditional prediction pipelines that focus solely on classification performance, EXHALE emphasizes interpretability, transparency, and explanation faithfulness, enabling healthcare stakeholders to understand not only what a model predicts, but why it predicts it.
 
 ---
 
 # Research Objectives
 
-The primary goals of this research are:
+The primary objectives of EXHALE are:
 
-* Predict asthma diagnosis using NHANES clinical and demographic data
-* Compare multiple baseline ML algorithms
-* Improve performance using hyperparameter tuning
-* Generate patient-level explanations using SHAP
-* Convert SHAP outputs into human-readable clinical explanations using multiple LLMs
-* Evaluate explanation fidelity using the proposed S-FEEM framework
+• Develop interpretable machine learning models for asthma risk prediction using NHANES 2011–2012 data.
+
+• Translate feature-level model explanations into clinically meaningful reasoning using large language models.
+
+• Quantify the fidelity and consistency of LLM-generated explanations.
+
+• Introduce S-FEEM, a semantic evaluation framework for assessing explanation quality beyond lexical overlap.
+
+• Investigate how explanation faithfulness varies across different LLM architectures.
 
 ---
 
@@ -400,16 +397,19 @@ python src/sfeem.py
 
 ---
 
-# Research Contribution
+# Research Contributions
 
-This framework contributes:
+EXHALE contributes:
 
-* A reproducible asthma prediction pipeline
-* Integration of explainable AI with healthcare ML
-* Multi-LLM explanation generation
-* A novel semantic fidelity evaluation framework (S-FEEM)
+• An interpretable machine learning framework for asthma risk prediction using nationally representative healthcare data.
 
-The work aims to improve transparency and trustworthiness in clinical AI systems.
+• A clinical reasoning generation pipeline that transforms SHAP-based explanations into human-readable medical narratives using multiple LLMs.
+
+• FEEM, a lexical fidelity evaluation framework for assessing explanation faithfulness.
+
+• S-FEEM, a semantic extension that evaluates explanation fidelity, consistency, and hallucination robustness.
+
+• A reproducible methodology for studying trustworthiness and interpretability in LLM-augmented healthcare AI systems.
 
 ---
 
@@ -446,7 +446,8 @@ MIT License
 - Shivam Pawar
 - Harshita Dixit
 
-AI/ML Research Project — CLEAR-AI-Framework
+AI/ML Research Project — EXHALE-Framework
+
 Manipal University Jaipur
 ```
 
