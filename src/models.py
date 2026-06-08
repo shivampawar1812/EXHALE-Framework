@@ -1,6 +1,7 @@
 import os
 import joblib
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -381,6 +382,21 @@ def tune_svm(
         y_pred_svm
     )
 
+    svm_precision = precision_score(
+        y_test,
+        y_pred_svm
+    )
+
+    svm_recall = recall_score(
+        y_test,
+        y_pred_svm
+    )
+
+    svm_f1 = f1_score(
+        y_test,
+        y_pred_svm
+    )
+
     svm_auc = roc_auc_score(
 
         y_test,
@@ -394,6 +410,9 @@ def tune_svm(
         f"Accuracy : "
         f"{svm_accuracy:.4f}"
     )
+    print(f"Precision: {svm_precision:.4f}")
+    print(f"Recall   : {svm_recall:.4f}")
+    print(f"F1 Score : {svm_f1:.4f}")
 
     print(
         f"ROC-AUC  : "
@@ -437,7 +456,16 @@ def tune_svm(
         "outputs/models/tuned_svm.pkl"
     )
 
-    return best_svm, y_prob_svm, svm_auc
+
+    return (
+    best_svm,
+    y_prob_svm,
+    svm_accuracy,
+    svm_auc,
+    svm_precision,
+    svm_recall,
+    svm_f1
+)
 
 # =========================================================
 # HYPERPARAMETER TUNING OF XGB
@@ -571,6 +599,21 @@ def tune_xgboost(
         y_pred_xgb
     )
 
+    xgb_precision = precision_score(
+        y_test,
+        y_pred_xgb
+    )
+
+    xgb_recall = recall_score(
+        y_test,
+        y_pred_xgb
+    )
+
+    xgb_f1 = f1_score(
+        y_test,
+        y_pred_xgb
+    )
+
     xgb_auc = roc_auc_score(
 
         y_test,
@@ -584,6 +627,10 @@ def tune_xgboost(
         f"Accuracy : "
         f"{xgb_accuracy:.4f}"
     )
+
+    print(f"Precision: {xgb_precision:.4f}")
+    print(f"Recall   : {xgb_recall:.4f}")
+    print(f"F1 Score : {xgb_f1:.4f}")
 
     print(
         f"ROC-AUC  : "
@@ -627,7 +674,17 @@ def tune_xgboost(
         "outputs/models/tuned_xgboost.pkl"
     )
 
-    return best_xgb, y_prob_xgb, xgb_auc
+    return (
+        best_xgb,
+        y_prob_xgb,
+        xgb_accuracy,
+        xgb_auc,
+        xgb_precision,
+        xgb_recall,
+        xgb_f1
+    )
+
+
 
 # =========================================================
 # MAIN
@@ -650,21 +707,81 @@ if __name__ == "__main__":
         y_test
     )
 
-    best_svm, y_prob_svm, svm_auc = tune_svm(
-
+    (
+    best_svm,
+    y_prob_svm,
+    svm_accuracy,
+    svm_auc,
+    svm_precision,
+    svm_recall,
+    svm_f1
+    ) = tune_svm(
         X_train,
         X_test,
         y_train,
         y_test
     )
 
-    best_xgb, y_prob_xgb, xgb_auc = tune_xgboost(
-
+    (
+    best_xgb,
+    y_prob_xgb,
+    xgb_accuracy,
+    xgb_auc,
+    xgb_precision,
+    xgb_recall,
+    xgb_f1
+    ) = tune_xgboost(
         X_train,
         X_test,
         y_train,
         y_test
     )
+
+    comparison_df = pd.DataFrame([
+
+        {
+
+            "Model": "Tuned SVM",
+
+            "Accuracy": svm_accuracy,
+
+            "Precision": svm_precision,
+
+            "Recall": svm_recall,
+
+            "F1 Score": svm_f1,
+
+            "ROC AUC": svm_auc
+        },
+
+        {
+
+            "Model": "Tuned XGBoost",
+
+            "Accuracy": xgb_accuracy,
+
+            "Precision": xgb_precision,
+
+            "Recall": xgb_recall,
+
+            "F1 Score": xgb_f1,
+
+            "ROC AUC": xgb_auc
+        }
+    ])
+
+    comparison_df.to_csv(
+
+        "outputs/models/tuned_model_comparison.csv",
+
+        index=False
+    )
+
+    print(comparison_df)
+
+    # =========================================================
+    # ROC-CURVE SVM VS XGBOOST
+    # =========================================================
 
     plt.plot(
         *roc_curve(y_test, y_prob_svm)[:2],
@@ -682,6 +799,173 @@ if __name__ == "__main__":
 
     plt.savefig(
         "outputs/plots/roc_auc.png"
+    )
+
+    plt.show()
+
+
+
+    svm_metrics = [
+
+        svm_precision,
+        svm_recall,
+        svm_f1,
+        svm_auc
+    ]
+
+    xgb_metrics = [
+
+        xgb_precision,
+        xgb_recall,
+        xgb_f1,
+        xgb_auc
+    ]
+
+    labels = [
+
+        "Precision",
+        "Recall",
+        "F1",
+        "ROC-AUC"
+    ]
+
+    x = range(len(labels))
+
+    width = 0.35
+
+    plt.figure(figsize=(8,5))
+
+    plt.bar(
+        [i-width/2 for i in x],
+        svm_metrics,
+        width,
+        label="SVM"
+    )
+
+    plt.bar(
+        [i+width/2 for i in x],
+        xgb_metrics,
+        width,
+        label="XGBoost"
+    )
+
+    plt.xticks(x, labels)
+
+    plt.ylabel("Score")
+
+    plt.title("Tuned Model Performance Comparison")
+
+    plt.legend()
+
+    plt.tight_layout()
+
+    plt.savefig(
+        "outputs/plots/model_metrics_comparison.png",
+        dpi=300
+    )
+
+    plt.show()
+
+
+
+    # =========================================================
+    # RADAR CHART : SVM vs XGBOOST
+    # =========================================================
+
+    categories = [
+
+        "Precision",
+        "Recall",
+        "F1",
+        "ROC-AUC"
+    ]
+
+    svm_scores = [
+
+        svm_precision,
+        svm_recall,
+        svm_f1,
+        svm_auc
+    ]
+
+    xgb_scores = [
+
+        xgb_precision,
+        xgb_recall,
+        xgb_f1,
+        xgb_auc
+    ]
+
+    # Close the polygon
+
+    svm_scores += svm_scores[:1]
+    xgb_scores += xgb_scores[:1]
+
+    angles = np.linspace(
+        0,
+        2*np.pi,
+        len(categories),
+        endpoint=False
+    ).tolist()
+
+    angles += angles[:1]
+
+    # Plot
+
+    fig, ax = plt.subplots(
+        figsize=(7,7),
+        subplot_kw=dict(polar=True)
+    )
+
+    ax.plot(
+        angles,
+        svm_scores,
+        linewidth=2,
+        label="SVM"
+    )
+
+    ax.fill(
+        angles,
+        svm_scores,
+        alpha=0.1
+    )
+
+    ax.plot(
+        angles,
+        xgb_scores,
+        linewidth=2,
+        label="XGBoost"
+    )
+
+    ax.fill(
+        angles,
+        xgb_scores,
+        alpha=0.1
+    )
+
+    ax.set_xticks(
+        angles[:-1]
+    )
+
+    ax.set_xticklabels(
+        categories
+    )
+
+    ax.set_ylim(0,1)
+
+    plt.title(
+        "SVM vs XGBoost Performance Radar Chart",
+        pad=20
+    )
+
+    plt.legend(
+        loc="upper right"
+    )
+
+    plt.savefig(
+        "outputs/plots/radar_chart.png",
+        dpi=300,
+        bbox_inches="tight"
     )
 
     plt.show()

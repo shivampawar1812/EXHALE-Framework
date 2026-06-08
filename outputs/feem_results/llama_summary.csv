@@ -1,2 +1,2 @@
-Model,Average_Fidelity,Average_Weighted_Fidelity,Entropy,Exact_Match_Accuracy
-llama,0.61,0.586,0.752,0.0
+Model,Average_Fidelity,Average_Weighted_Fidelity,Entropy
+llama,0.79,0.803,0.517
