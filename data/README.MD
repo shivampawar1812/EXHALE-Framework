@@ -1,6 +1,6 @@
 # NHANES Dataset Setup
 
-The CLEAR-AI framework uses publicly available NHANES 2011–2012 data released by the CDC.
+The EXHALE framework uses publicly available NHANES 2011–2012 data released by the CDC.
 
 Due to NHANES data usage and repository size considerations, the raw `.XPT` files are **not included** in this repository and must be downloaded manually.
 
